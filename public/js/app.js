@@ -1,5 +1,5 @@
 var scene, camera, renderer;
-var geometry, material, mesh, pointLight;
+var geometry, material, mesh, pointLight, controls, plane;
  
 init();
 animate();
@@ -7,26 +7,35 @@ animate();
 function init() {
  
 	scene = new THREE.Scene();
+	scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
  
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10000 );
-	camera.position.set(0,0,500);
+	camera.position.set(400,6,910);
  
 	geometry = new THREE.BoxGeometry( 200, 200, 200 );
 	material = new THREE.MeshLambertMaterial( { 
-		color: 0x008000, 
+		color: 0x981414, 
 		wireframe: false, 
 		// emissive: 0x0000ff 
 	} );
  
 	mesh = new THREE.Mesh( geometry, material );
+	mesh.position.y = -230;
+	mesh.receiveShadow = true;
+	mesh.castShadow = true;
 	scene.add( mesh );
  
 	renderer = new THREE.WebGLRenderer({
-		alpha: true
+		// alpha: true,
+		antialias: true
 	});
 	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setClearColor(0x0aaaad);
+	renderer.setClearColor( scene.fog.color );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	renderer.gammaInput = true;
+	renderer.gammaOutput = true;
+	// renderer.shadowMap.enabled = true;
  
 	document.querySelector('#canvasRenderer').appendChild( renderer.domElement );
 
@@ -38,15 +47,15 @@ function init() {
 	pointLight2.position.set(-100,-550,100);
 	// scene.add( pointLight2 );
 
-	scene.add( new THREE.AmbientLight( 0x323232 )); // soft white light
+	scene.add( new THREE.AmbientLight( 0x666666 )); // soft white light
 
 	var sphereSize = 10;
 	var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
-	scene.add( pointLightHelper );
+	// scene.add( pointLightHelper );
 
-	var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
-	light.position.set( 50, 200, 100 );
-	light.position.multiplyScalar( 1 );
+	var light = new THREE.DirectionalLight( 0xdfebff, 1.7 );
+	light.position.set( 50, 600, 300 );
+	light.position.multiplyScalar( 1.3 );
 
 	light.castShadow = true;
 	light.shadow.mapSize.width = 1024;
@@ -59,18 +68,27 @@ function init() {
 	light.shadow.camera.far = 1000;
 	scene.add( light );
 
+	var dlh = new THREE.DirectionalLightHelper(light, 10);
+	scene.add(dlh);
+
 
 	var loader = new THREE.TextureLoader();
 	var groundTexture = loader.load( 'textures/grasslight-big.jpg' );
 	groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 	groundTexture.repeat.set( 25, 25 );
 	groundTexture.anisotropy = 16;
+
 	var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
-	var plane = new THREE.plane( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
-	plane.position.y = - 250;
+	plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+	plane.position.y = - 350;
 	plane.rotation.x = - Math.PI / 2;
 	plane.receiveShadow = true;
 	scene.add( plane );
+
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls.maxPolarAngle = Math.PI * 0.5;
+	controls.minDistance = 1000;
+	controls.maxDistance = 7500;
  
 }
  
@@ -79,9 +97,9 @@ function animate() {
 	requestAnimationFrame( animate );
  
 	// mesh.rotation.x = Math.sin( time * 0.1 ) * 10;
-	mesh.rotation.x += 0.02;
+	// mesh.rotation.x += 0.02;
 	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.02;
+	// mesh.rotation.z += 0.02;
 
 	var time = Date.now() * 0.0005;
 	pointLight.position.x = Math.sin( time * 0.7 ) * 30;
