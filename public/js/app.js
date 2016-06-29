@@ -79,7 +79,7 @@ function init() {
 	groundTexture.anisotropy = 16;
 
 	var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
-	plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+	plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 30000, 30000 ), groundMaterial );
 	plane.position.y = - 350;
 	plane.rotation.x = - Math.PI / 2;
 	plane.receiveShadow = true;
